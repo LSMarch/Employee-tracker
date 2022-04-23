@@ -1,12 +1,50 @@
-const mysql = require('mysql2')
 const inquirer = require('inquirer');
+const queryFun = require('./queryFunctions')
+const db = require('./connection')
 
-const db = mysql.createConnection(
+function main() {
+inquirer.prompt([
     {
-        host: 'localhost',
-        user: 'root',
-        password: 'root',
-        database: 'tracker_db'
-    },
-    console.log(`Connected to the tracker_db database`)
-);
+        type: "list",
+        name: "mainMenu",
+        message: "Which would you like to do?",
+        choices: ["View all employees",
+                    "Add employee",
+                    "Update employee role",
+                    "View all roles",
+                    "Add role",
+                    "View all departments",
+                    "Add department", 
+                    "Quit"
+                ],
+    }
+])
+        .then((answer) => {
+        console.log(answer);
+        switch (answer.mainMenu) {
+            case "View all employees": {
+                db.query('select * from employee', function (err, results){
+                    console.log(results)
+                    main()
+                })
+                break;
+            } // end case
+            case "View all departments": {
+                db.query('select * from department', function (err, results){
+                    console.log(results)
+                    //main()
+                })
+                break;
+            }
+            case "View all roles": {
+                db.query('select * from employ_role', (err,results) =>{
+                    console.log(results)
+                    //main()
+                })
+                break;
+            }
+        }
+    })
+}
+
+main();
