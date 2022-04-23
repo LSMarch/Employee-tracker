@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
-const queryFun = require('./queryFunctions')
+//const queryFun = require('./queryFunctions')
 const db = require('./connection')
+const showTable = require('console.table')
 
 function main() {
 inquirer.prompt([
@@ -19,27 +20,26 @@ inquirer.prompt([
                 ],
     }
 ])
-        .then((answer) => {
-        console.log(answer);
+        .then((answer) => {        
         switch (answer.mainMenu) {
             case "View all employees": {
-                db.query('select * from employee', function (err, results){
-                    console.log(results)
+                db.query('select first_name as First, last_name as Last from employee', function (err, results){
+                    console.table('Employees', results)
                     main()
                 })
                 break;
             } // end case
             case "View all departments": {
-                db.query('select * from department', function (err, results){
-                    console.log(results)
-                    //main()
+                db.query('select depart_name as Departments from department', function (err, results){
+                    console.table(results)
+                    main()
                 })
                 break;
             }
             case "View all roles": {
-                db.query('select * from employ_role', (err,results) =>{
-                    console.log(results)
-                    //main()
+                db.query('select title as Title from employ_role', (err,results) =>{
+                    console.table(results)
+                    main()
                 })
                 break;
             }
