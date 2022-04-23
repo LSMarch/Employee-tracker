@@ -4,25 +4,26 @@ create database tracker_db;
 use tracker_db;
 
 create table department (
-    id int auto_increment primary key,
-    department_name varchar(30)
+    id int not null auto_increment primary key,
+    depart_name varchar(30) not null
 );
 
-create table position (
-    id int primary key,
-    title varchar(30),
-    salary decimal,
-    department_id int,
-    foreign key (department_id)
-    references department(id)
+create table employ_role (
+    id int not null auto_increment primary key,
+    title varchar(30) not null,
+    salary decimal(10,2) not null,
+    depart_id int not null,
+    foreign key (depart_id) references department(id)
 );
 
 create table employee (
-    id int primary key,
-    first_name varchar(30),
-    last_name varchar(30),
-    position_id int,
-    foreign key (position_id)
-    references position(id)
+    id int not null auto_increment primary key,
+    first_name varchar(30) not null,
+    last_name varchar(30) not null,
+    employ_role_id int,
+    manager_id int,
+    foreign key (employ_role_id) references employ_role(id),
+    foreign key (manager_id) references employee(id)
+    
 );
 
