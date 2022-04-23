@@ -11,14 +11,14 @@ function viewAllEmp() {
 function viewAllRoles() {
     db.query('select title as Title from employ_role', (err,resuts) => {
         console.table(resuts)
-        //main()
+        main()
     })
 }
 
 function viewAllDept() {
     db.query('select depart_name as Departments from department', function (err, results){
         console.table(results)
-        //main()
+        main()
     })
 }
 
@@ -28,4 +28,5 @@ module.exports = {
     viewAllDept,
 }
 
+//module.exports = menuFunctions
 

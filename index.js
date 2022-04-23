@@ -1,8 +1,6 @@
 const inquirer = require('inquirer');
-//const queryFun = require('./queryFunctions')
-//const db = require('./connection')
-//const showTable = require('console.table')
-const { viewAllEmp, viewAllRoles, viewAllDept } = require('./menuFunctions')
+const menuFun = require('./menuFunctions')
+require('dotenv').config();
 
 function main() {
 inquirer.prompt([
@@ -23,46 +21,24 @@ inquirer.prompt([
 ])
         .then((answer) => {
             switch (answer.mainMenu) {
-                case "View all employees":
-                    viewAllEmp();
+                case "View all employees":                    
+                    menuFun.viewAllEmp()                                     
                     break;
 
                 case "View all roles":
-                    viewAllRoles()
+                    menuFun.viewAllRoles()
                     break;
 
                 case "View all departments":
-                    viewAllDept()
+                    menuFun.viewAllDept()
                     break;
 
                 default:
+                    main()
                     break;
             }
-        })
+        })       
 }
-
-// function viewAllEmp() {
-//     db.query('select first_name as First, last_name as Last from employee', function (err,results){
-//         console.table('Employees', results)
-//         main()
-//     })
-        
-// }
-
-// function viewAllRoles() {
-//     db.query('select title as Title from employ_role', (err,resuts) => {
-//         console.table(resuts)
-//         main()
-//     })
-// }
-
-// function viewAllDept() {
-//     db.query('select depart_name as Departments from department', function (err, results){
-//         console.table(results)
-//         main()
-//     })
-// }
-
 
 
 main()
