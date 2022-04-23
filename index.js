@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
-const menuFun = require('./menuFunctions')
-require('dotenv').config();
+//const menuFun = require('./menuFunctions')
+const db = require('./connection')
+const showTable = require('console.table')
 
 function main() {
 inquirer.prompt([
@@ -21,24 +22,71 @@ inquirer.prompt([
 ])
         .then((answer) => {
             switch (answer.mainMenu) {
-                case "View all employees":                    
-                    menuFun.viewAllEmp()                                     
-                    break;
+                // case "View all employees":                    
+                //     viewAllEmp()                                     
+                //     break;
 
-                case "View all roles":
-                    menuFun.viewAllRoles()
-                    break;
+                // case "View all roles":
+                //     viewAllRoles()
+                //     break;
 
-                case "View all departments":
-                    menuFun.viewAllDept()
-                    break;
+                // case "View all departments":
+                //     viewAllDept()
+                //     break;
+                case "Add department":
+                    addDept()
+                    break
 
-                default:
-                    main()
+                default:                    
                     break;
             }
         })       
 }
+
+
+// add a department
+function addDept () {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'addDept',
+            message: 'What department would you like to add?'
+        }
+    ])
+    .then((answer) => {
+        db.query('insert into department (depart_name) values(?)', answer.addDept, (err,results) => {
+            console.log('dept added')
+            console.table(results)
+        })
+    })
+}
+
+// view all employees
+function viewAllEmp() {
+    db.query('select first_name as First, last_name as Last from employee', function (err,results){
+        console.table('Employees', results)
+        main()
+    })  
+}
+
+// view all roles
+function viewAllRoles() {
+    db.query('select title as Title from employ_role', (err,resuts) => {
+        console.table(resuts)
+        main()
+    })
+}
+
+// view all departments
+function viewAllDept() {
+    db.query('select depart_name as Departments from department', function (err, results){
+        console.table(results)
+        main()
+    })
+}
+
+
+
 
 
 main()

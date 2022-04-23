@@ -8,4 +8,4 @@ select * from employ_role;
 select * from employee;
 
 -- add dept
-insert into department (id, depart_name) values
+insert into department (depart_name) values 
