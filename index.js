@@ -47,6 +47,10 @@ inquirer.prompt([
                     addRole()
                     break;
 
+                case "Update employee role":
+                    updateEmployee()
+                    break;
+
                 default:                    
                     break;
             }
@@ -64,6 +68,17 @@ roleSelect = () => {
     })
     return roleArr
     
+}
+
+// select employee opt
+const employeeArr = [];
+employeeSelect = () => {
+    db.query('select first_name, last_name from employee', (err, results) => {
+        for (var i = 0; i < results.length; i++) {
+            employeeArr.push(results[i].first_name)
+        }
+    })
+    return employeeArr
 }
 
 // select dept opt
@@ -90,7 +105,78 @@ managerSelect = () => {
     return managerArr
 }
 
+updateEmployee = () => {
+    db.query('select employee.first_name as Name, employ_role.title as Title from employee join employ_role on employee.employ_role_id = employ_role.id', (err, results) => {
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'updateFirstName',
+                message: 'Which employee would you like to update?',
+                choices: employeeSelect()
+            },
+            {
+                type: 'list',
+                name: 'updateRole',
+                message: 'What is the new role?',
+                choices: roleSelect()
+            },
+            
+        ])
+        .then((answer) => {
+            const roleId = roleSelect().indexOf(answer.updateRole) + 1
+            const employName = employeeSelect().indexOf(answer.updateFirstName) + 1 
+            db.query('update employee set where ?', 
+            {
+                first_name: employName
+            },
+            {
+                employ_role_id: roleId
+            },
+            (err, result) => {
+                console.table(answer)
+            })
+            }) // end then
+            //console.table('select employee.first_name as Name, employ_role.title as Title from employee join employ_role on employee.employ_role_id = employ_role.id',(err, results) => {
+            })
+        }
+    
+
+
 // add a role
+addRole = () => {
+    db.query('select title as Title from employ_role', (err, results) => {
+        inquirer.prompt([
+            {
+                type: 'input',
+                name: 'addRole',
+                message: 'What role would you like to add?'
+            },
+            {
+                type: 'number',
+                name: 'roleSal',
+                message: 'What is the starting salary for the role?'
+            },
+            {
+                type: 'list',
+                name: 'roleDept',
+                message: 'Which department will the role belong?',
+                choices: deptSelect()
+            },
+        ])
+        .then((answer) => {
+            const deptId = deptSelect().indexOf(answer.roleDept) + 1
+            db.query('insert into employ_role set ?', 
+            {
+                title: answer.addRole,
+                salary: answer.roleSal,
+                depart_id: deptId
+            }, (err, results) => {
+                //console.table(answer)
+            })
+            viewAllRoles()            
+        })
+    })
+}
 
 
 // add a department
@@ -139,8 +225,8 @@ addEmploy = () => {
         },
 ])
     .then((answer) => {
-        let roleId = roleSelect().indexOf(answer.newEmployRole) + 1
-        let managerId = managerSelect().indexOf(answer.newEmployManager) + 1
+        const roleId = roleSelect().indexOf(answer.newEmployRole) + 1
+        const managerId = managerSelect().indexOf(answer.newEmployManager) + 1
         db.query('insert into employee set ?',
         {
             first_name: answer.firstName,
@@ -148,7 +234,7 @@ addEmploy = () => {
             manager_id: managerId,
             employ_role_id: roleId
         }, (err, results) => {
-        console.table(answer)            
+        //console.table(answer)            
         })
         viewAllEmp()
     })
