@@ -117,8 +117,7 @@ function updateEmployee () {
                 name: first_name + " " + last_name,    
                 value: id            
             })
-        })        
-    
+        })       
 
     db.query("select * from employ_role", (err, resultsRole) => {
         if (err) throw err;
@@ -130,8 +129,7 @@ function updateEmployee () {
             })
         })
     
-
-    inquirer.prompt([
+    let Q = [
         {
             type: 'list',
             name: 'updateEmployChoice',
@@ -144,25 +142,26 @@ function updateEmployee () {
             message: "Which role would you like to give the employee?",
             choices: updateRole
         },
-    ])
+    ]
+
+    inquirer.prompt(Q)
     .then(answer => {
         const update = 'update employee set ? where ?? = ?';
         db.query(update, [
-            {
-                employ_role_id: answer.updateRoleChoice,
-                "id": answer.updateEmployChoice                 
-            },
-        ], (err, results => {
+            {employ_role_id: answer.updateRoleChoice},
+                "id", answer.updateEmployChoice                 
+            
+        ], (err, results) => {
             if (err) throw err;
-
-            console.log('did it')
-        }))
-    })
-})
+            db.query('select employee.first_name, employ_role.title from employee join employ_role on employee.employ_role_id = employ_role.id', (err,result) => {
+                console.table(result)
+                main()  
+            })            
+        });    
+    })    
+});
 })
 }
-    
-
 
 // add a role
 addRole = () => {
@@ -200,7 +199,6 @@ addRole = () => {
         })
     })
 },
-
 
 // add a department
 function addDept () {
@@ -263,7 +261,6 @@ addEmploy = () => {
     })
 },
 
-
 // view all employees
 function viewAllEmp() {
     db.query('select first_name as First, last_name as Last from employee', function (err,results){
@@ -287,9 +284,5 @@ function viewAllDept() {
         main()
     })
 },
-
-
-
-
 
 main()
