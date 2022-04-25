@@ -72,14 +72,17 @@ roleSelect = () => {
 
 // select employee opt
 const employeeArr = [];
-employeeSelect = () => {
-    db.query('select first_name, last_name from employee', (err, results) => {
+employeeSelect = () => {    
+    db.query('select * from employee', (err, results) => {
         for (var i = 0; i < results.length; i++) {
             employeeArr.push(results[i].first_name)
         }
     })
     return employeeArr
 }
+
+// seelect employee for update
+
 
 // select dept opt
 const deptArr = [];
@@ -99,46 +102,65 @@ managerSelect = () => {
     db.query('select first_name, last_name from employee', (err, results) => {
         if (err) console.log(err)
         for (var i = 0; i < results.length; i++) {
-            managerArr.push(results[i].first_name)
+            managerArr.push(results[i])
         }
     })
     return managerArr
 }
 
-updateEmployee = () => {
-    db.query('select employee.first_name as Name, employ_role.title as Title from employee join employ_role on employee.employ_role_id = employ_role.id', (err, results) => {
-        inquirer.prompt([
-            {
-                type: 'list',
-                name: 'updateFirstName',
-                message: 'Which employee would you like to update?',
-                choices: employeeSelect()
-            },
-            {
-                type: 'list',
-                name: 'updateRole',
-                message: 'What is the new role?',
-                choices: roleSelect()
-            },
-            
-        ])
-        .then((answer) => {
-            const roleId = roleSelect().indexOf(answer.updateRole) + 1
-            const employName = employeeSelect().indexOf(answer.updateFirstName) + 1 
-            db.query('update employee set where ?', 
-            {
-                first_name: employName
-            },
-            {
-                employ_role_id: roleId
-            },
-            (err, result) => {
-                console.table(answer)
+function updateEmployee () {    
+    db.query("select * from employee", (err, resultsEmploy) => {
+        if (err) throw err;
+        const updateEmploy = []
+        resultsEmploy.forEach(({ first_name, last_name, id }) => {
+            updateEmploy.push({
+                name: first_name + " " + last_name,    
+                value: id            
             })
-            }) // end then
-            //console.table('select employee.first_name as Name, employ_role.title as Title from employee join employ_role on employee.employ_role_id = employ_role.id',(err, results) => {
+        })        
+    
+
+    db.query("select * from employ_role", (err, resultsRole) => {
+        if (err) throw err;
+        const updateRole = []
+        resultsRole.forEach(({ title, id }) => {
+            updateRole.push({
+                name: title,
+                value: id
             })
-        }
+        })
+    
+
+    inquirer.prompt([
+        {
+            type: 'list',
+            name: 'updateEmployChoice',
+            message: "Which employ would you like to update?",
+            choices: updateEmploy
+        },
+        {
+            type: 'list',
+            name: 'updateRoleChoice',
+            message: "Which role would you like to give the employee?",
+            choices: updateRole
+        },
+    ])
+    .then(answer => {
+        const update = 'update employee set ? where ?? = ?';
+        db.query(update, [
+            {
+                employ_role_id: answer.updateRoleChoice,
+                "id": answer.updateEmployChoice                 
+            },
+        ], (err, results => {
+            if (err) throw err;
+
+            console.log('did it')
+        }))
+    })
+})
+})
+}
     
 
 
@@ -171,12 +193,13 @@ addRole = () => {
                 salary: answer.roleSal,
                 depart_id: deptId
             }, (err, results) => {
-                //console.table(answer)
+                if (err) throw err
+                //console.table(results)
             })
             viewAllRoles()            
         })
     })
-}
+},
 
 
 // add a department
@@ -196,7 +219,7 @@ function addDept () {
         viewAllDept()
         //main()
     })
-}
+},
 
 // add an employee
 addEmploy = () => {
@@ -238,7 +261,7 @@ addEmploy = () => {
         })
         viewAllEmp()
     })
-}
+},
 
 
 // view all employees
@@ -247,7 +270,7 @@ function viewAllEmp() {
         console.table('Employees', results)
         main()
     })  
-}
+},
 
 // view all roles
 function viewAllRoles() {
@@ -255,7 +278,7 @@ function viewAllRoles() {
         console.table(resuts)
         main()
     })
-}
+},
 
 // view all departments
 function viewAllDept() {
@@ -263,7 +286,7 @@ function viewAllDept() {
         console.table(results)
         main()
     })
-}
+},
 
 
 
