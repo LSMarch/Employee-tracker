@@ -1,11 +1,8 @@
 const inquirer = require('inquirer');
-//const menuFun = require('./menuFunctions')
 const db = require('./connection')
-const showTable = require('console.table')
+const showTable = require('console.table') 
 
- 
-
-function main() {
+main = () => {
 inquirer.prompt([
     {
         type: "list",
@@ -51,12 +48,15 @@ inquirer.prompt([
                     updateEmployee()
                     break;
 
+                case "Quit":
+                    exit()
+                    break;
+
                 default:                    
                     break;
             }
         })       
 }
-
 // select role opt
 const roleArr = [];
 roleSelect = () => {    
@@ -69,7 +69,6 @@ roleSelect = () => {
     return roleArr
     
 }
-
 // select employee opt
 const employeeArr = [];
 employeeSelect = () => {    
@@ -80,10 +79,6 @@ employeeSelect = () => {
     })
     return employeeArr
 }
-
-// seelect employee for update
-
-
 // select dept opt
 const deptArr = [];
 deptSelect = () => {
@@ -95,7 +90,6 @@ deptSelect = () => {
     })
     return deptArr
 }
-
 // select manager opt
 const managerArr = [];
 managerSelect = () => {
@@ -107,8 +101,8 @@ managerSelect = () => {
     })
     return managerArr
 }
-
-function updateEmployee () {    
+// update employee
+updateEmployee = () => {    
     db.query("select * from employee", (err, resultsEmploy) => {
         if (err) throw err;
         const updateEmploy = []
@@ -162,7 +156,6 @@ function updateEmployee () {
 });
 })
 }
-
 // add a role
 addRole = () => {
     db.query('select title as Title from employ_role', (err, results) => {
@@ -198,10 +191,9 @@ addRole = () => {
             viewAllRoles()            
         })
     })
-},
-
+}
 // add a department
-function addDept () {
+addDept = () => {
     inquirer.prompt([
         {
             type: 'input',
@@ -217,8 +209,7 @@ function addDept () {
         viewAllDept()
         //main()
     })
-},
-
+}
 // add an employee
 addEmploy = () => {
     inquirer.prompt([
@@ -259,30 +250,31 @@ addEmploy = () => {
         })
         viewAllEmp()
     })
-},
-
+}
 // view all employees
-function viewAllEmp() {
+viewAllEmp = () => {
     db.query('select first_name as First, last_name as Last from employee', function (err,results){
         console.table('Employees', results)
         main()
     })  
-},
-
+}
 // view all roles
-function viewAllRoles() {
+viewAllRoles = () => {
     db.query('select title as Title from employ_role', (err,resuts) => {
         console.table(resuts)
         main()
     })
-},
-
+}
 // view all departments
-function viewAllDept() {
+viewAllDept = () => {
     db.query('select depart_name as Departments from department', function (err, results){
         console.table(results)
         main()
     })
-},
-
+}
+// exit process
+exit = () => {
+    console.log('Thank you')
+    process.exit()
+}
 main()
