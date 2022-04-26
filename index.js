@@ -9,12 +9,12 @@ inquirer.prompt([
         name: "mainMenu",
         message: "Which would you like to do?",
         choices: ["View all employees",
-                    "Add employee",
-                    "Update employee role",
                     "View all roles",
-                    "Add role",
                     "View all departments",
-                    "Add department", 
+                    "Add employee",                                       
+                    "Add role",                    
+                    "Add department",
+                    "Update Employee",
                     "Quit"
                 ],
     }
@@ -147,7 +147,8 @@ updateEmployee = () => {
             
         ], (err, results) => {
             if (err) throw err;
-            db.query('select employee.first_name, employ_role.title from employee join employ_role on employee.employ_role_id = employ_role.id', (err,result) => {
+            db.query('select employee.first_name as First, employee.last_name as Last, employ_role.title as Title from employee join employ_role on employee.employ_role_id = employ_role.id', (err,result) => {
+                console.log('Employee has been updated')
                 console.table(result)
                 main()  
             })            
@@ -186,8 +187,8 @@ addRole = () => {
                 depart_id: deptId
             }, (err, results) => {
                 if (err) throw err
-                //console.table(results)
-            })
+                console.log('New role has been added')                
+            })            
             viewAllRoles()            
         })
     })
@@ -203,11 +204,10 @@ addDept = () => {
     ])
     .then((answer) => {
         db.query('insert into department (depart_name) values(?)', answer.addDept, (err,results) => {
-            console.log('dept added')            
-            //console.table(results)            
+            if (err) throw err
+            console.log('New department has been added')                       
         })
-        viewAllDept()
-        //main()
+        viewAllDept()        
     })
 }
 // add an employee
@@ -246,29 +246,34 @@ addEmploy = () => {
             manager_id: managerId,
             employ_role_id: roleId
         }, (err, results) => {
-        //console.table(answer)            
+            if (err) throw err
+            console.log('New employee has been added')            
         })
         viewAllEmp()
     })
 }
 // view all employees
 viewAllEmp = () => {
-    db.query('select first_name as First, last_name as Last from employee', function (err,results){
-        console.table('Employees', results)
+    db.query('select employee.id as ID, employee.first_name as First, employee.last_name as Last, employ_role.title as Title, employ_role.salary as Salary, department.depart_name as Department, employee.manager_id as Manager from employee join employ_role on employee.employ_role_id = employ_role.id join department on employ_role.depart_id = department.id', function (err,results){
+        if (err) throw err
+
+        console.table('Viewing all Employees', results)
         main()
     })  
 }
 // view all roles
 viewAllRoles = () => {
-    db.query('select title as Title from employ_role', (err,resuts) => {
-        console.table(resuts)
+    db.query('select employ_role.id as ID, employ_role.title as Title, employ_role.salary as Salary, depart_name as Department from employ_role join department on employ_role.depart_id = department.id', (err,resuts) => {
+        if (err) throw err
+        console.table('Viewing all Roles', resuts)
         main()
     })
 }
 // view all departments
 viewAllDept = () => {
-    db.query('select depart_name as Departments from department', function (err, results){
-        console.table(results)
+    db.query('select id as ID, depart_name as Department from department', function (err, results){
+        if (err) throw err
+        console.table('Viewing all Departments', results)
         main()
     })
 }

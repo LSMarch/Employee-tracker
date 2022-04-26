@@ -2,10 +2,10 @@
 select depart_name as Departments from department;
 
 -- show all roles
-select title as Title from employ_role;
+select employ_role.id as ID, employ_role.title as Title, employ_role.salary as Salary, depart_name as Department from employ_role join department on employ_role.depart_id = department.id;
 
 -- show all employees
-select first_name as First, last_name as Last from employee;
+select employee.id as ID, employee.first_name as First, employee.last_name as Last, employ_role.title as Title, employ_role.salary as Salary, department.depart_name as Department, employee.manager_id as Manager from employee join employ_role on employee.employ_role_id = employ_role.id join department on employ_role.depart_id = department.id;
 
 -- add dept
 insert into department (depart_name) values (?)

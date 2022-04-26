@@ -33,6 +33,6 @@
     - Update employee role
     - Exit
 
-7. 
+7. Call function to start prompts
 
 
