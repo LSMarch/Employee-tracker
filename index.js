@@ -11,10 +11,10 @@ inquirer.prompt([
         choices: ["View all employees",
                     "View all roles",
                     "View all departments",
-                    "Add an employee",                                       
-                    "Add a role",                    
-                    "Add a department",
-                    "Update an employee",
+                    "Add department",                                       
+                    "Add role",                    
+                    "Add employee",
+                    "Update employee",
                     "Quit"
                 ],
     }
@@ -36,15 +36,15 @@ inquirer.prompt([
                     addDept()
                     break;
                 
-                case "Add employee":
-                    addEmploy()
-                    break;
-
                 case "Add role":
                     addRole()
                     break;
 
-                case "Update employee role":
+                case "Add employee":
+                    addEmploy()
+                    break;
+
+                case "Update employee":
                     updateEmployee()
                     break;
 
@@ -61,9 +61,9 @@ inquirer.prompt([
 const roleArr = [];
 roleSelect = () => {    
     db.query('select title from employ_role', (err, results) => {
+        if (err) throw err
         for (var i = 0; i < results.length; i++) {
-            roleArr.push(results[i].title)
-            //console.log(roleArr)            
+            roleArr.push(results[i].title)                        
         }
     })
     return roleArr
@@ -73,6 +73,7 @@ roleSelect = () => {
 const employeeArr = [];
 employeeSelect = () => {    
     db.query('select * from employee', (err, results) => {
+        if (err) throw err
         for (var i = 0; i < results.length; i++) {
             employeeArr.push(results[i].first_name)
         }
@@ -83,7 +84,7 @@ employeeSelect = () => {
 const deptArr = [];
 deptSelect = () => {
     db.query('select depart_name from department', (err, results) => {
-        if (err) console.log(err)
+        if (err) throw err
         for (var i = 0; i < results.length; i++) {
             deptArr.push(results[i].depart_name)
         }
@@ -134,7 +135,7 @@ updateEmployee = () => {
             type: 'list',
             name: 'updateRoleChoice',
             message: "Which role would you like to give the employee?",
-            choices: updateRole
+            choices: updateRole 
         },
     ]
 
@@ -147,19 +148,21 @@ updateEmployee = () => {
             
         ], (err, results) => {
             if (err) throw err;
-            db.query('select employee.first_name as First, employee.last_name as Last, employ_role.title as Title from employee join employ_role on employee.employ_role_id = employ_role.id', (err,result) => {
+            db.query('select employee.first_name as First, employee.last_name as Last, employ_role.title as Title from employee join employ_role on employee.employ_role_id = employ_role.id', (err,results) => {
+                if (err) throw err
                 console.log('Employee has been updated')
-                console.table(result)
-                main()  
+                //console.table(results)
+                viewAllEmp()  
             })            
         });    
     })    
 });
 })
-} // end updateEmployee
+} 
 // add a role
 addRole = () => {
     db.query('select title as Title from employ_role', (err, results) => {
+        if (err) throw err
         inquirer.prompt([
             {
                 type: 'input',
@@ -288,9 +291,9 @@ viewAllEmp = () => {
 }
 // view all roles
 viewAllRoles = () => {
-    db.query('select employ_role.id as ID, employ_role.title as Title, employ_role.salary as Salary, depart_name as Department from employ_role join department on employ_role.depart_id = department.id', (err,resuts) => {
+    db.query('select employ_role.id as ID, employ_role.title as Title, employ_role.salary as Salary, depart_name as Department from employ_role join department on employ_role.depart_id = department.id', (err,results) => {
         if (err) throw err
-        console.table('Viewing all Roles', resuts)
+        console.table('Viewing all Roles', results)
         main()
     })
 }
@@ -307,4 +310,5 @@ exit = () => {
     console.log('Thank you')
     process.exit()
 }
+
 main()
