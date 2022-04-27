@@ -14,8 +14,11 @@ insert into department (depart_name) values (?)
 insert into employ_role (title) values(?)
 
 -- add employee
-insert into employee(first_name, last_name, employ_role_id)
+insert into employee(first_name, last_name, employ_role_id, manager_id)
 
 -- update employee
+update employee set ? where ?? = ?
+
+-- update employee join table
 select employee.first_name, employ_role.title from employee join employ_role on employee.employ_role_id = employ_role.id;
 

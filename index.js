@@ -11,10 +11,10 @@ inquirer.prompt([
         choices: ["View all employees",
                     "View all roles",
                     "View all departments",
-                    "Add employee",                                       
-                    "Add role",                    
-                    "Add department",
-                    "Update Employee",
+                    "Add an employee",                                       
+                    "Add a role",                    
+                    "Add a department",
+                    "Update an employee",
                     "Quit"
                 ],
     }
@@ -93,7 +93,7 @@ deptSelect = () => {
 // select manager opt
 const managerArr = [];
 managerSelect = () => {
-    db.query('select first_name, last_name from employee', (err, results) => {
+    db.query('select first_name from employee', (err, results) => {
         if (err) console.log(err)
         for (var i = 0; i < results.length; i++) {
             managerArr.push(results[i])
@@ -110,7 +110,7 @@ updateEmployee = () => {
             updateEmploy.push({
                 name: first_name + " " + last_name,    
                 value: id            
-            })
+            }) 
         })       
 
     db.query("select * from employ_role", (err, resultsRole) => {
@@ -156,7 +156,7 @@ updateEmployee = () => {
     })    
 });
 })
-}
+} // end updateEmployee
 // add a role
 addRole = () => {
     db.query('select title as Title from employ_role', (err, results) => {
@@ -212,7 +212,27 @@ addDept = () => {
 }
 // add an employee
 addEmploy = () => {
-    inquirer.prompt([
+    db.query("select * from employ_role", (err, resultsRoleChoice) => {
+        if (err) throw err;
+        const roleChoice = []
+        resultsRoleChoice.forEach(({ title, id }) => {
+            roleChoice.push({
+                name: title,
+                value: id
+            })
+        })
+
+    db.query('select * from employee', (err, resultsMan) => {
+        if (err) throw err
+        const managerChoice = []
+        resultsMan.forEach(({ first_name, last_name, id }) => {
+            managerChoice.push({
+                name: first_name + " " + last_name,
+                value: id
+            })
+        })    
+
+    let addQuestions = [
         {
             type: 'input',
             name: 'firstName',
@@ -227,30 +247,35 @@ addEmploy = () => {
             type: 'list',
             name: 'newEmployRole',
             message: "What is employee's role?",
-            choices: roleSelect()
+            choices: roleChoice
         },
         {
             type: 'list',
             name: 'newEmployManager',
             message: "Who is employee's manager?",
-            choices: managerSelect()
+            choices: managerChoice
         },
-])
-    .then((answer) => {
-        const roleId = roleSelect().indexOf(answer.newEmployRole) + 1
-        const managerId = managerSelect().indexOf(answer.newEmployManager) + 1
-        db.query('insert into employee set ?',
-        {
-            first_name: answer.firstName,
-            last_name: answer.lastName,
-            manager_id: managerId,
-            employ_role_id: roleId
-        }, (err, results) => {
-            if (err) throw err
-            console.log('New employee has been added')            
-        })
-        viewAllEmp()
+]
+    inquirer.prompt(addQuestions)
+    .then(answer => {
+        const newEmployee = 'insert into employee set ?';
+        db.query(newEmployee, [
+            {
+                first_name: answer.firstName,
+                last_name: answer.lastName,
+                employ_role_id: answer.newEmployRole,
+                manager_id: answer.newEmployManager
+            },           
+        ], (err, results) => {
+            if (err) throw err;
+            console.log('Employee added successfully')            
+            })
+        viewAllEmp()            
+        });    
     })
+})
+    
+
 }
 // view all employees
 viewAllEmp = () => {
